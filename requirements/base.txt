@@ -1,0 +1,27 @@
+# Base
+pytz==2018.7
+python-slugify==1.2.6
+Pillow==5.3.0
+psycopg2==2.9.3 --no-binary psycopg2
+
+# Django
+django==3.2.13
+
+# Environment
+django-environ==0.4.5
+django-debug-toolbar==3.4.0
+
+#django restramework
+djangorestframework ==3.13.1
+
+django-filter == 21.1
+# JWT
+PyJWT == 2.4.0
+
+# Passwords security
+argon2-cffi==21.3.0
+
+
+# Static files
+whitenoise==4.1.2
+
