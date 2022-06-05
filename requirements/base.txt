@@ -13,6 +13,7 @@ django-debug-toolbar==3.4.0
 
 #django restramework
 djangorestframework ==3.13.1
+drf-yasg
 
 django-filter == 21.1
 # JWT

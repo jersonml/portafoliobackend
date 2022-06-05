@@ -2,6 +2,7 @@
 
 #utils
 from json import load
+from pyexpat import model
 
 #Django library
 from django.db import models
@@ -50,6 +51,11 @@ class Users(MasterModel, AbstractUser):
         choices= COUNTRIES_CHOICE,
         default= DEFAULT_COUNTRIE,
         help_text="Seleccionar país"
+    )
+
+    is_verify = models.BooleanField(
+        'verify users',
+        default= False
     )
 
     def __str__(self) -> str:

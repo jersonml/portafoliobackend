@@ -10,7 +10,6 @@ from rest_framework.permissions import (
 from portafoliobackend.users.permissions import IsAccountOwner
 
 
-from portafoliobackend.circles.serializers import CircleModelSerializer
 from portafoliobackend.users.serializers import ProfileModelSerializer
 from portafoliobackend.users.serializers import (
     UserLoginSerializer,
@@ -19,13 +18,12 @@ from portafoliobackend.users.serializers import (
     AccountVerificationSerializer
 )
 from portafoliobackend.users.models import Users
-from portafoliobackend.circles.models import Circle
 
 class UserViewSet(mixins.RetrieveModelMixin,
                 mixins.UpdateModelMixin,
                 viewsets.GenericViewSet):
 
-    queryset = Users.objects.filter(is_active=True, is_client=True)
+    queryset = Users.objects.filter(is_active=True)
     serializer_class = UserModelSerializer
     lookup_field = 'username'
 
@@ -84,17 +82,3 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.save()
         data = UserModelSerializer(user).data
         return Response(data)
-
-
-    def retrieve(self, request, *args, **kwargs):
-        response = super(UserViewSet, self).retrieve(request, *args, **kwargs)
-        circles = Circle.objects.filter(
-            members= request.user,
-            membership__is_active = True
-        )
-        data = {
-            'user': response.data,
-            'circles': CircleModelSerializer(circles, many=True).data
-        }
-        response.data = data
-        return response 
