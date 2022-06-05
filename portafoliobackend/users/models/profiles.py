@@ -13,10 +13,10 @@ class Profile(MasterModel):
 
     #Relations
     user = models.OneToOneField('users.Users', on_delete=models.CASCADE)
-    courses = models.ManyToManyField('experience.Courses', on_delete= models.CASCADE)
-    social_networks = models.ManyToManyField('socialnetworks.SocialNetworks', on_delete= models.CASCADE)
-    items = models.ManyToManyField('experience.Items', on_delete=models.CASCADE)
-    work = models.ManyToManyField('experience.Work', on_delete=models.CASCADE)
+    courses = models.ManyToManyField('experience.Courses')
+    social_networks = models.ManyToManyField('socialnetworks.SocialNetworks')
+    items = models.ManyToManyField('experience.Items')
+    work = models.ManyToManyField('experience.Works')
 
     #Files
     picture = models.ImageField(
@@ -25,7 +25,7 @@ class Profile(MasterModel):
         blank = True,
         null= True 
     )
-    resume = models.FieldFile(
+    resume = models.FileField(
         'Resume users',
         upload_to='users/resume/',
         blank = True,
@@ -49,7 +49,7 @@ class Profile(MasterModel):
         help_text="Cualidades del usuario"
     )
 
-    years_experience = models.DateTimeField()
+    date_experience = models.DateTimeField()
 
     def __str__(self):
         return str(self.user)

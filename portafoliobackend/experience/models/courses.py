@@ -17,22 +17,18 @@ class Courses(MasterModel):
 
     #Text
     name = models.CharField(
-        min_length=3, 
         max_length=50,
         help_text= "Nombre del curso, ejemplo: Python profesional"
     )
     category = models.CharField(
-        min_length=3, 
         max_length=30,
         help_text= "Categoría del curso, ejemplo: Backend"
     )
     sub_category = models.CharField(
-        min_length=3, 
         max_length=30,
         help_text= "sub Categoría del curso, ejemplo: Python"
     )
-    plataform = models.TextField(
-        min_length=5, 
+    plataform = models.CharField(
         max_length=50,
         blank=True,
         null=True,
@@ -46,7 +42,7 @@ class Courses(MasterModel):
         blank = True,
         null= True 
     )
-    certificate = models.FieldFile(
+    certificate = models.FileField(
         'Resume users',
         upload_to='users/certificate/',
         blank = True,
