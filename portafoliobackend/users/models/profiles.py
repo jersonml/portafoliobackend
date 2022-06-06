@@ -16,7 +16,7 @@ class Profile(MasterModel):
     courses = models.ManyToManyField('experience.Courses')
     social_networks = models.ManyToManyField('socialnetworks.SocialNetworks')
     items = models.ManyToManyField('experience.Items')
-    work = models.ManyToManyField('experience.Works')
+    works = models.ManyToManyField('experience.Works')
 
     #Files
     picture = models.ImageField(
@@ -49,7 +49,7 @@ class Profile(MasterModel):
         help_text="Cualidades del usuario"
     )
 
-    date_experience = models.DateTimeField()
+    date_experience = models.DateTimeField(null=True)
 
     def __str__(self):
         return str(self.user)

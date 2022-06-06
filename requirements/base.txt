@@ -9,13 +9,14 @@ django==3.2.13
 
 # Environment
 django-environ==0.4.5
-django-debug-toolbar==3.4.0
 
 #django restramework
 djangorestframework ==3.13.1
+django-rest-knox
 drf-yasg
 
 django-filter == 21.1
+
 # JWT
 PyJWT == 2.4.0
 

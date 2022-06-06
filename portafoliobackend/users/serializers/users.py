@@ -1,24 +1,28 @@
-from datetime import timedelta
+#Django
 from django.conf import settings
 from django.contrib.auth import authenticate,password_validation
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
-
-
-from rest_framework import serializers
-from rest_framework.authtoken.models import Token
-from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 
-#models
-from portafoliobackend.users.models import Users
-from portafoliobackend.users.models.profiles import Profile
+#Django Rest Framekwork
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
-#utilities
+#Library
 from datetime import timedelta
 import jwt
 
+#Permissions
+from knox.models import AuthToken
+
+
+#Models
+from portafoliobackend.users.models import Users
+from portafoliobackend.users.models.profiles import Profile
+
+#Serializer
 from portafoliobackend.users.serializers.profile import ProfileModelSerializer
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -34,7 +38,8 @@ class UserModelSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'phone_number',
-            'profile'
+            'profile',
+            'country'
         )
 
 class UserLoginSerializer(serializers.Serializer):
@@ -47,14 +52,23 @@ class UserLoginSerializer(serializers.Serializer):
 
         if not user:
             raise serializers.ValidationError('Invalid credentials')
-        if not user.is_verified:
-            raise serializers.ValidationError('Account is not active yet :(')
+        if not user.is_active:
+            raise serializers.ValidationError('User inactive')
         self.context['user'] = user
         return attrs
 
     def create(self, validated_data):
-        token, _ = Token.objects.get_or_create(user= self.context['user'])
-        return self.context['user'], token.key
+        token= AuthToken.objects.create(self.context['user'])[1]
+        self.context['token'] = token
+        return self.context['user']
+
+    def to_representation(self, instance):
+        return {
+            'user': self.context['user'],
+            'access_token': self.context['token']
+        }
+
+    
 
 class AccountVerificationSerializer(serializers.Serializer):
     
@@ -109,31 +123,27 @@ class UserSignupSerializer(serializers.Serializer):
     )
 
     password = serializers.CharField(min_length=8, max_length=64)
-    password_confirmation = serializers.CharField(min_length=8, max_length=64)
 
     first_name = serializers.CharField(min_length=2, max_length=30)
     last_name = serializers.CharField(min_length=2, max_length=30)
 
     def validate(self,data):
         password = data['password']
-        password_conf = data['password_confirmation']
-
-        if password != password_conf:
-            raise serializers.ValidationError("Password don't match")
+       
         password_validation.validate_password(password)
         return data
 
     def create(self, validated_data):
-        validated_data.pop('password_confirmation')
         user = Users.objects.create_user(**validated_data, is_verified=False)
         Profile.objects.create(user= user)
         self.send_confirmation_email(user)
-        return user
+        token= AuthToken.objects.get_or_create(self.context['user'])[1]
+        return user, token
     
     def send_confirmation_email(self,user):
         verification_token = self.gen_verification_token(user)
-        subject = f'Welcome @{user.username} verify your account to start using Comparte ride'
-        from_email = "Comparte Ride <xljersonlx@gmail.com>"
+        subject = f'Welcome @{user.username} verify your account to start using Portaolio'
+        from_email = "Portafolio <xljersonlx@gmail.com>"
         content = render_to_string(
             'emails/users/account_verification.html',
             {'token': verification_token,'user':user}
@@ -153,3 +163,9 @@ class UserSignupSerializer(serializers.Serializer):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token
+
+#Documentation
+class ResponseUserModelSerializer(serializers.Serializer):
+
+    user =  UserModelSerializer(many=True, read_only=True)
+    access_token = serializers.CharField()

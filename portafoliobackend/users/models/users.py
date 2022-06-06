@@ -19,7 +19,7 @@ class Users(MasterModel, AbstractUser):
 
     """
     #CONSTANTE
-    DEFAULT_COUNTRIE = "VE"
+    DEFAULT_COUNTRIE = "Venezuela"
     
     #Se leen todos os países
     with open('portafoliobackend/utils/data/countries.json') as f:
@@ -53,7 +53,7 @@ class Users(MasterModel, AbstractUser):
         help_text="Seleccionar país"
     )
 
-    is_verify = models.BooleanField(
+    is_verified = models.BooleanField(
         'verify users',
         default= False
     )
