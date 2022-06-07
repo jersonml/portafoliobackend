@@ -2,9 +2,8 @@
 from django.shortcuts import get_object_or_404
 
 #Djano rest framework library
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework import status, viewsets,mixins
+
+from rest_framework import viewsets,mixins
 from rest_framework.parsers import MultiPartParser
 
 #Permisos
@@ -13,22 +12,20 @@ from portafoliobackend.users.permissions import (
     IsAccountVerified
 )
 from rest_framework.permissions import (
-    IsAuthenticated
+    IsAuthenticated,
+    AllowAny
 )
 #Authentication
 from knox.auth import TokenAuthentication
-
 
 #Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 #Serializers
-from portafoliobackend.users.serializers import ProfileModelSerializer
 from portafoliobackend.experience.serializers import CoursesModelSerializer
 
 #Models
-from portafoliobackend.experience.models import Courses
 from portafoliobackend.users.models import Profile, Users
 
 #Documentation
@@ -62,7 +59,12 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
 
 
     def dispatch(self, request, *args, **kwargs):
-
+        """
+        It takes the username from the URL and uses it to get the user object from the database
+        
+        :param request: The request object
+        :return: The super class is being returned.
+        """
         username = kwargs['username']
         self.user = get_object_or_404(Users, username=username)
         return super(CoursesViewSet,self).dispatch(request, *args, **kwargs)
@@ -74,6 +76,13 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
         """
         profile: Profile = self.user.profile
         return profile.courses.all()
+    
+    def get_permissions(self):
+        if self.action in ['create','update','partial_update']:
+            permissions = [IsAuthenticated, IsAccountOwner, IsAccountVerified]
+        else:
+            permissions = [AllowAny]
+        return [p() for p in permissions]
 
     def perform_create(self, serializer):
         """
@@ -85,3 +94,10 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
         course = serializer.save()
         profile: Profile = self.user.profile
         profile.courses.add(course)
+    
+    """ @swagger_auto_schema(
+        operation_description="Actualizar parcialmente un curso",
+        request_body=
+    )"""
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)

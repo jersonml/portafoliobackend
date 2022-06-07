@@ -18,7 +18,8 @@ class Courses(MasterModel):
     #Text
     name = models.CharField(
         max_length=50,
-        help_text= "Nombre del curso, ejemplo: Python profesional"
+        help_text= "Nombre del curso, ejemplo: Python profesional",
+        editable=False
     )
     category = models.CharField(
         max_length=30,

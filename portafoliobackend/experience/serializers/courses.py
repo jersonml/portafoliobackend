@@ -19,3 +19,5 @@ class CoursesModelSerializer(serializers.ModelSerializer):
             'date_approved'
         ]
       
+
+#Serializer Doc 
