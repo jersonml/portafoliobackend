@@ -13,10 +13,10 @@ class Profile(MasterModel):
 
     #Relations
     user = models.OneToOneField('users.Users', on_delete=models.CASCADE)
-    courses = models.ManyToManyField('experience.Courses')
-    social_networks = models.ManyToManyField('socialnetworks.SocialNetworks')
-    items = models.ManyToManyField('experience.Items')
-    works = models.ManyToManyField('experience.Works')
+    courses = models.ManyToManyField('experience.Courses', related_name='courses')
+    social_networks = models.ManyToManyField('socialnetworks.SocialNetworks',related_name='social_networks')
+    items = models.ManyToManyField('experience.Items',related_name='items')
+    works = models.ManyToManyField('experience.Works',related_name='works')
 
     #Files
     picture = models.ImageField(

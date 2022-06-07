@@ -38,8 +38,8 @@ class UserModelSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'phone_number',
+            'country',
             'profile',
-            'country'
         )
 
 class UserLoginSerializer(serializers.Serializer):
@@ -95,6 +95,11 @@ class AccountVerificationSerializer(serializers.Serializer):
         user.is_verified = True
         user.save()
 
+    def to_representation(self, instance):
+        return {
+             'message': 'Congratulation,Welcome!'
+        }
+
 class UserSignupSerializer(serializers.Serializer):
 
     email = serializers.EmailField(
@@ -137,8 +142,8 @@ class UserSignupSerializer(serializers.Serializer):
         user = Users.objects.create_user(**validated_data, is_verified=False)
         Profile.objects.create(user= user)
         self.send_confirmation_email(user)
-        token= AuthToken.objects.get_or_create(self.context['user'])[1]
-        return user, token
+        self.context['token'] = AuthToken.objects.get_or_create(self.context['user'])[1]
+        return user
     
     def send_confirmation_email(self,user):
         verification_token = self.gen_verification_token(user)
@@ -163,6 +168,12 @@ class UserSignupSerializer(serializers.Serializer):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token
+    
+    def to_representation(self, instance):
+        return {
+            'user': self.context['user'],
+            'access_token': self.context['token']
+        }
 
 #Documentation
 class ResponseUserModelSerializer(serializers.Serializer):

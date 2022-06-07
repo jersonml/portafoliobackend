@@ -37,5 +37,6 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path(settings.ADMIN_URL, admin.site.urls),
     path('',include(('portafoliobackend.users.urls','users'), namespace='users')),
+    path('',include(('portafoliobackend.experience.urls','courses'), namespace='courses')),
     
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

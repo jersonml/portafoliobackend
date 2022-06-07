@@ -49,10 +49,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
     def get_permissions(self):
         if self.action in ['signup','login','verify']:
             permissions = [AllowAny]
-        elif self.action == ['update','partial_update']:
-            permissions = [IsAuthenticated, IsAccountOwner,IsAccountVerified]
-        elif self.action == ['retrieve']:
+        elif self.action in ['update','partial_update','retrieve']:
             permissions = [IsAuthenticated, IsAccountOwner]
+        elif self.action in ['profile']:
+            permissions = [IsAuthenticated, IsAccountOwner,IsAccountVerified]
         else:
             permissions = [IsAuthenticated]
         return [p() for p in permissions]
@@ -60,7 +60,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
     @swagger_auto_schema(
         operation_description='Login de usuario, retorna los datos del mismo más el token de authentificación',
         request_body= UserLoginSerializer,
-        responses={200:ResponseUserModelSerializer}
+        responses={
+            200:ResponseUserModelSerializer
+        }
     )
     @action(detail=False,methods=['post'])
     def login(self, request):
@@ -69,27 +71,43 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.save()
         return Response(serializer.data, status= status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        operation_description='Crear usuario',
+        request_body= UserSignupSerializer,
+        responses={
+            201:UserModelSerializer
+        }
+    )
     @action(detail=False,methods=['post'])
     def signup(self, request):
         serializer = UserSignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user,token = serializer.save()
-        data = {
-            'user': UserModelSerializer(user).data,
-            'access_token': token
-        }
-        return Response(data, status= status.HTTP_201_CREATED)
+        serializer.save()
+        return Response(serializer.data, status= status.HTTP_201_CREATED)
 
+    @swagger_auto_schema(
+        operation_description='Verificar a un usuario mediante código que llega al correo',
+        request_body= AccountVerificationSerializer,
+        responses={
+            200:UserModelSerializer
+        }
+    )
     @action(detail=False,methods=['post'])
     def verify(self, request):
         serializer = AccountVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = {
-            'message': 'Congratulation,Welcome!',
-        }
-        return Response(data, status= status.HTTP_200_OK)
+        return Response(serializer.data, status= status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_description='Edición de perfil',
+        methods=['put','patch'],
+        request_body= ProfileModelSerializer,
+        responses={
+            200:UserModelSerializer
+        },
+        tags=['Profile']
+    )
     @action(detail=True, methods=['put','patch'])
     def profile(self, request, *args, **kwargs):
         user = self.get_object()

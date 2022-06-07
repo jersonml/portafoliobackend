@@ -19,7 +19,7 @@ class Users(MasterModel, AbstractUser):
 
     """
     #CONSTANTE
-    DEFAULT_COUNTRIE = "Venezuela"
+    DEFAULT_COUNTRIE = "VE"
     
     #Se leen todos os países
     with open('portafoliobackend/utils/data/countries.json') as f:
