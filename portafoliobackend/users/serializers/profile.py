@@ -17,6 +17,8 @@ class ProfileModelSerializer(serializers.ModelSerializer):
     items = ItemsModelSerializer(many=True)
     works = WorksModelSerializer(many=True)
 
+    #experience = serializers.SerializerMethodField()
+
     class Meta:
 
         model = Profile
@@ -30,7 +32,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'biography',
             'level_academy',
             'qualities',
-            'date_experience'
+            'experience'
         )
         read_only_fields = (
             'courses',
@@ -38,6 +40,26 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'items',
             'works'
         )
+        
 
+    """def get_experience(self, obj):
+        return {
+            'years':obj.experience.total_minutes
+        }"""
+
+
+class ListProfileModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Profile
+        fields = (
+            'picture',
+            'resume',
+            'biography',
+            'level_academy',
+            'qualities',
+            'experience'
+        )
 
       

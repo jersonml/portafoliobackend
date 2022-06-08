@@ -1,4 +1,5 @@
 #Django
+from distutils.command.upload import upload
 from django.db import models
 
 #Models
@@ -19,6 +20,12 @@ class Works(MasterModel):
         blank = True,
         null = True
     )
+    capture = models.ImageField(
+        'Capture work constance',
+        upload_to = 'users/work/img/',
+        blank = True,
+        null = True
+    )
     
     #Text
     name = models.CharField(
@@ -27,7 +34,8 @@ class Works(MasterModel):
     )
     rif = models.CharField(
         max_length=30,
-        help_text= "Identificación de la empresa"
+        help_text= "Identificación de la empresa",
+        blank=True
     )
     position = models.CharField(
         max_length=30,

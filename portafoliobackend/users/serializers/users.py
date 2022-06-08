@@ -23,12 +23,31 @@ from portafoliobackend.users.models import Users
 from portafoliobackend.users.models.profiles import Profile
 
 #Serializer
-from portafoliobackend.users.serializers.profile import ProfileModelSerializer
+from portafoliobackend.users.serializers.profile import (
+    ListProfileModelSerializer, 
+    ProfileModelSerializer
+)
 
 class UserModelSerializer(serializers.ModelSerializer):
 
     profile = ProfileModelSerializer(read_only=True)
     
+    class Meta:
+
+        model = Users
+        fields = (
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'country',
+            'profile',
+        )
+
+class ListUserModelSerializer(serializers.ModelSerializer):
+    profile = ListProfileModelSerializer(read_only=True)
+
     class Meta:
 
         model = Users
@@ -67,8 +86,6 @@ class UserLoginSerializer(serializers.Serializer):
             'user': self.context['user'],
             'access_token': self.context['token']
         }
-
-    
 
 class AccountVerificationSerializer(serializers.Serializer):
     

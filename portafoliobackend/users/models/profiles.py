@@ -49,7 +49,10 @@ class Profile(MasterModel):
         help_text="Cualidades del usuario"
     )
 
-    date_experience = models.DateTimeField(null=True)
+    experience = models.DurationField(
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return str(self.user)

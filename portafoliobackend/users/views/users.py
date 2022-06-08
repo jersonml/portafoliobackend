@@ -1,4 +1,5 @@
 #Djano rest framework library
+from re import I
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, viewsets,mixins
@@ -6,10 +7,11 @@ from rest_framework import status, viewsets,mixins
 #Permisos
 from rest_framework.permissions import (
     AllowAny,
-    IsAuthenticated
+    IsAuthenticated,
+    IsAdminUser
 )
 
-from portafoliobackend.users.permissions import IsAccountAdmin, IsAccountOwner, IsAccountVerified
+from portafoliobackend.users.permissions import  IsAccountOwner, IsAccountVerified
 
 #Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -22,7 +24,8 @@ from portafoliobackend.users.serializers import (
     UserModelSerializer,
     UserSignupSerializer,
     AccountVerificationSerializer,
-    ResponseUserModelSerializer
+    ResponseUserModelSerializer,
+    ListUserModelSerializer
 )
 
 #Models
@@ -34,6 +37,7 @@ from knox.views import LogoutAllView,LogoutView
 #Documentation
 from drf_yasg.utils import swagger_auto_schema
 
+
 # It's a viewset that allows you to retrieve, list, and update users.
 class UserViewSet(mixins.RetrieveModelMixin,
                 mixins.ListModelMixin,
@@ -41,7 +45,6 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 viewsets.GenericViewSet):
 
     queryset = Users.objects.filter(is_active=True)
-    serializer_class = UserModelSerializer
     lookup_field = 'username'
 
     #Filters
@@ -75,6 +78,16 @@ class UserViewSet(mixins.RetrieveModelMixin,
         else:
             permissions = [AllowAny]
         return [p() for p in permissions]
+
+    def get_serializer_class(self):
+        """
+        If the action is list, return the ListUserModelSerializer, otherwise return the
+        UserModelSerializer
+        """
+        if self.action == 'list':
+            return ListUserModelSerializer
+        else: 
+            return UserModelSerializer
 
     # A decorator that is used to document the view.
     @swagger_auto_schema(
@@ -175,11 +188,11 @@ class UserLogoutView(LogoutView):
 
 
 # > This class is a subclass of the `LogoutAllView` class, and it overrides the `permissions`
-# attribute to add the `IsAccountOwner`, `IsAccountVerified`, and `IsAccountAdmin` permissions
+# attribute to add the `IsAccountOwner`, `IsAccountVerified`, and `` permissions
 class UserLogoutAllView(LogoutAllView):
     permissions = [
         IsAuthenticated, 
         IsAccountOwner,
         IsAccountVerified, 
-        IsAccountAdmin
+        IsAdminUser
     ]

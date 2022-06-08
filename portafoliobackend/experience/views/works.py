@@ -1,11 +1,9 @@
-#django
+#Django
 from django.shortcuts import get_object_or_404
 
 #Djano rest framework library
-
 from rest_framework import viewsets,mixins
 from rest_framework.parsers import MultiPartParser
-from portafoliobackend.experience.models.courses import Courses
 
 #Permisos
 from portafoliobackend.users.permissions import (
@@ -24,16 +22,17 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 #Serializers
-from portafoliobackend.experience.serializers import CoursesModelSerializer
+from portafoliobackend.experience.serializers import WorksModelSerializer
 
 #Models
 from portafoliobackend.users.models import Profile, Users
+from portafoliobackend.experience.models import Works
 
 #Documentation
 from drf_yasg.utils import swagger_auto_schema
 
 # It's a viewset that allows you to create, list, update and retrieve courses
-class CoursesViewSet(mixins.RetrieveModelMixin,
+class WorksViewSet(mixins.RetrieveModelMixin,
                 mixins.ListModelMixin,
                 mixins.UpdateModelMixin,
                 mixins.CreateModelMixin,
@@ -41,23 +40,23 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
                 viewsets.GenericViewSet):
 
     #Serializer
-    serializer_class = CoursesModelSerializer
+    serializer_class = WorksModelSerializer
     #url param
     lookup_field = 'name'
     #permission and authentification
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated, IsAccountOwner,IsAccountVerified]
 
-    parser_classes = (MultiPartParser,)
+    #parser_classes = (MultiPartParser,)
 
     #Filters
     filter_backends = (SearchFilter, OrderingFilter,DjangoFilterBackend)
-    search_fields = ('name','category','sub_category','leve')
-    ordering_fields = ('date_approved','category','sub_category')
-    ordering = ('date_approved','category')
+    search_fields = ('name','position','date_end')
+    ordering_fields = ('date_end','position')
+    ordering = ('date_end')
 
     #tags documentation
-    my_tags = ["Courses"]
+    my_tags = ["Works"]
 
 
     def dispatch(self, request, *args, **kwargs):
@@ -69,7 +68,7 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
         """
         username = kwargs['username']
         self.user = get_object_or_404(Users, username=username)
-        return super(CoursesViewSet,self).dispatch(request, *args, **kwargs)
+        return super(WorksViewSet,self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         """
@@ -77,11 +76,17 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
         :return: The courses that the user is enrolled in.
         """
         if getattr(self, "swagger_fake_view", False):
-            return Courses.objects.none()
-            
+            return Works.objects.none()
+
         profile: Profile = self.user.profile
-        return profile.courses.all()
-    
+        return profile.works.all()
+
+    """def get_parsers(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return []
+
+        return super().get_parsers()"""
+        
     def get_permissions(self):
         if self.action in ['create','update','partial_update']:
             permissions = [IsAuthenticated, IsAccountOwner, IsAccountVerified]
@@ -98,11 +103,5 @@ class CoursesViewSet(mixins.RetrieveModelMixin,
         """
         course = serializer.save()
         profile: Profile = self.user.profile
-        profile.courses.add(course)
-    
-    """ @swagger_auto_schema(
-        operation_description="Actualizar parcialmente un curso",
-        request_body=
-    )"""
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        profile.works.add(course)
+  

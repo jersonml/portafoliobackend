@@ -1,14 +1,29 @@
+#Django Rest Framework
 from rest_framework import serializers
 
-from portafoliobackend.experience.models import Works
+#Models
+from portafoliobackend.experience.models import Works, Items
+
+
 from portafoliobackend.experience.serializers import ItemsModelSerializer
 
 class WorksModelSerializer(serializers.ModelSerializer):
 
-    tags = ItemsModelSerializer()
+    tags = ItemsModelSerializer(many=True)
 
     class Meta:
 
         model = Works
-        exclude= ['id', 'created','modified']
+        fields = [
+            'tags',
+            'constancy',
+            'capture',
+            'name',
+            'rif',
+            'position',
+            'description',
+            'link',
+            'date_init',
+            'date_end'
+        ]
       

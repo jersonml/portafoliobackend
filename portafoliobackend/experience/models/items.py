@@ -4,7 +4,7 @@ from django.db import models
 #Models
 from portafoliobackend.utils.models import MasterModel
 
-class Items(MasterModel):
+class   Items(MasterModel):
     """ Modelo que contiene los items del lenguaje
         de programación que maneja Hereda del modelo master 
     """
@@ -41,7 +41,11 @@ class Items(MasterModel):
     )
 
     #Date
-    date_experience = models.DateTimeField()
+    experience = models.DurationField(
+        blank=True,
+        null= True,
+        help_text= "Experience of items"
+    )
 
     def __str__(self):
         return str(self.name)
