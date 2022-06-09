@@ -1,0 +1,1 @@
+from .slug_name import *

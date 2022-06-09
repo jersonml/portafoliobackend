@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 
 #Djano rest framework library
 from rest_framework import viewsets,mixins
-from rest_framework.parsers import MultiPartParser
 
 #Permisos
 from portafoliobackend.users.permissions import (
@@ -24,6 +23,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 #Serializers
 from portafoliobackend.experience.serializers import WorksModelSerializer
 
+#Parses
+from drf_nested_field_multipart import NestedMultipartParser
+
 #Models
 from portafoliobackend.users.models import Profile, Users
 from portafoliobackend.experience.models import Works
@@ -42,12 +44,12 @@ class WorksViewSet(mixins.RetrieveModelMixin,
     #Serializer
     serializer_class = WorksModelSerializer
     #url param
-    lookup_field = 'name'
+    lookup_field = 'slug_name'
     #permission and authentification
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated, IsAccountOwner,IsAccountVerified]
 
-    #parser_classes = (MultiPartParser,)
+    parser_classes = (NestedMultipartParser,)
 
     #Filters
     filter_backends = (SearchFilter, OrderingFilter,DjangoFilterBackend)
@@ -93,6 +95,10 @@ class WorksViewSet(mixins.RetrieveModelMixin,
         else:
             permissions = [AllowAny]
         return [p() for p in permissions]
+
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         """

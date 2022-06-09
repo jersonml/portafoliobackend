@@ -10,6 +10,7 @@ class CoursesModelSerializer(serializers.ModelSerializer):
         model = Courses
         fields = [
             'name',
+            'slug_name',
             'category',
             'sub_category',
             'plataform',

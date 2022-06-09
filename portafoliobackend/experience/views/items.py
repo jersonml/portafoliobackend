@@ -41,7 +41,7 @@ class ItemsViewSet(mixins.RetrieveModelMixin,
     #Serializer
     serializer_class = ItemsModelSerializer
     #url param
-    lookup_field = 'name'
+    lookup_field = 'slug_name'
     #permission and authentification
     authentication_classes = (TokenAuthentication,)
     permission_classes = [IsAuthenticated, IsAccountOwner,IsAccountVerified]

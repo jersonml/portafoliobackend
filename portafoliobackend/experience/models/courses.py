@@ -4,6 +4,9 @@ from django.db import models
 #Models
 from portafoliobackend.utils.models import MasterModel
 
+#Manager
+from portafoliobackend.experience.managers import SlugNameManager
+
 class Courses(MasterModel):
     """ Modelo que contiene los cursos que realizo el usuario,
         Hereda del modelo master 
@@ -21,6 +24,10 @@ class Courses(MasterModel):
         help_text= "Nombre del curso, ejemplo: Python profesional",
         editable=False
     )
+    slug_name = models.SlugField(
+        unique=True,
+        max_length=40
+     )
     category = models.CharField(
         max_length=30,
         help_text= "Categoría del curso, ejemplo: Backend"
@@ -58,6 +65,9 @@ class Courses(MasterModel):
 
     #Date
     date_approved = models.DateTimeField()
+
+    #manager
+    objects = SlugNameManager
 
     def __str__(self):
         return str(self.user)

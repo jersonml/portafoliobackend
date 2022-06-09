@@ -4,6 +4,9 @@ from django.db import models
 #Models
 from portafoliobackend.utils.models import MasterModel
 
+#Manager
+from portafoliobackend.experience.managers import SlugNameManager
+
 class   Items(MasterModel):
     """ Modelo que contiene los items del lenguaje
         de programación que maneja Hereda del modelo master 
@@ -23,6 +26,10 @@ class   Items(MasterModel):
     category = models.CharField(
         max_length=30,
         help_text= "category, ejemplo: Backend, Ingles, Froned"
+    )
+    slug_name = models.SlugField(
+        unique=True,
+        max_length=40
     )
     sub_category = models.CharField(
         max_length=30,
@@ -46,6 +53,9 @@ class   Items(MasterModel):
         null= True,
         help_text= "Experience of items"
     )
+
+    #manager
+    objects = SlugNameManager
 
     def __str__(self):
         return str(self.name)

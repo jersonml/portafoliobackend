@@ -11,6 +11,7 @@ class ItemsModelSerializer(serializers.ModelSerializer):
         fields = [
             'name',
             'category',
+            'slug_name',
             'sub_category',
             'description',
             'leve',

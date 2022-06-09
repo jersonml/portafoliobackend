@@ -1,6 +1,6 @@
 #Django
-from distutils.command.upload import upload
 from django.db import models
+from portafoliobackend.experience.managers import SlugNameManager
 
 #Models
 from portafoliobackend.utils.models import MasterModel
@@ -32,6 +32,10 @@ class Works(MasterModel):
         max_length=50,
         help_text= "Nombre de la empresa donde se trabajó, ejemplo: Platzi"
     )
+    slug_name = models.SlugField(
+        unique=True,
+        max_length=40
+    )
     rif = models.CharField(
         max_length=30,
         help_text= "Identificación de la empresa",
@@ -53,6 +57,9 @@ class Works(MasterModel):
     #Date
     date_init = models.DateTimeField()
     date_end = models.DateTimeField()
+
+    #manager
+    objects = SlugNameManager
 
     def __str__(self):
         return str(self.name)
