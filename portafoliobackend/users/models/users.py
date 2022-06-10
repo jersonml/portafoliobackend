@@ -58,6 +58,12 @@ class Users(MasterModel, AbstractUser):
         default= False
     )
 
+    document = models.CharField(
+        max_length = 10,
+        unique = True,
+        help_text='Ingresar el documento'
+    )
+
     def __str__(self) -> str:
         return self.username
 

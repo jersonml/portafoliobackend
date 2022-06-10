@@ -1,18 +1,28 @@
 #Django Rest Framework
 from rest_framework import serializers
 
+#Serializers
+from portafoliobackend.experience.serializers.items import ItemsModelSerializer
+
 #Models
 from portafoliobackend.experience.models import Works
 from portafoliobackend.experience.models.items import Items
 
 class WorksModelSerializer(serializers.ModelSerializer):
 
-    tags = serializers.IntegerField(write_only=True)
+    item_id = serializers.ListField(
+        child= serializers.IntegerField(), 
+        write_only=True,
+        allow_empty=True
+
+    )
+    tags = ItemsModelSerializer(read_only=True, many=True)
 
     class Meta:
 
         model = Works
         fields = [
+            'item_id',
             'tags',
             'slug_name',
             'constancy',
@@ -33,3 +43,9 @@ class WorksModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Invalid items.')
 
         self.context['item'] = item
+
+        return id_item
+
+    def create(self, validated_data):
+        return super().create(validated_data)
+    

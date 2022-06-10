@@ -1,6 +1,6 @@
 #Django
 from django.conf import settings
-from django.contrib.auth import authenticate,password_validation
+from django.contrib.auth import password_validation, authenticate
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -13,10 +13,6 @@ from rest_framework.validators import UniqueValidator
 #Library
 from datetime import timedelta
 import jwt
-
-#Permissions
-from knox.models import AuthToken
-
 
 #Models
 from portafoliobackend.users.models import Users
@@ -64,28 +60,38 @@ class ListUserModelSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
 
     email = serializers.EmailField()
-    password = serializers.CharField(min_length=8,max_length = 128)
+   
+    password = serializers.CharField(
+        label="Password",
+        style={'input_type': 'password'},
+        trim_whitespace=False,
+        write_only=True
+    )
+    token = serializers.CharField(
+        label="Token",
+        read_only=True
+    )
 
     def validate(self, attrs):
-        user = authenticate(username= attrs['email'],password=attrs['password'])
+        email = attrs.get('email')
+        password = attrs.get('password')
 
-        if not user:
-            raise serializers.ValidationError('Invalid credentials')
-        if not user.is_active:
-            raise serializers.ValidationError('User inactive')
-        self.context['user'] = user
+        if email and password:
+            user = authenticate(request=self.context.get('request'),
+                                username=email, password=password)
+
+            # The authenticate call simply returns None for is_active=False
+            # users. (Assuming the default ModelBackend authentication
+            # backend.)
+            if not user:
+                msg = 'Unable to log in with provided credentials.'
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = 'Must include "username" and "password".'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
         return attrs
-
-    def create(self, validated_data):
-        token= AuthToken.objects.create(self.context['user'])[1]
-        self.context['token'] = token
-        return self.context['user']
-
-    def to_representation(self, instance):
-        return {
-            'user': self.context['user'],
-            'access_token': self.context['token']
-        }
 
 class AccountVerificationSerializer(serializers.Serializer):
     
@@ -117,7 +123,7 @@ class AccountVerificationSerializer(serializers.Serializer):
              'message': 'Congratulation,Welcome!'
         }
 
-class UserSignupSerializer(serializers.Serializer):
+class UserSignupSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
         validators=[
@@ -144,10 +150,18 @@ class UserSignupSerializer(serializers.Serializer):
         max_length=17, validators=[phone_regex]
     )
 
-    password = serializers.CharField(min_length=8, max_length=64)
-
-    first_name = serializers.CharField(min_length=2, max_length=30)
-    last_name = serializers.CharField(min_length=2, max_length=30)
+    class Meta:
+        model= Users
+        fields = [
+            'email',
+            'username',
+            'password',
+            'phone_number',
+            'first_name',
+            'last_name',
+            'country',
+            'document'
+        ]
 
     def validate(self,data):
         password = data['password']
@@ -156,10 +170,12 @@ class UserSignupSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        user = Users.objects.create_user(**validated_data, is_verified=False)
+        user = Users.objects.create_user(
+            **validated_data, 
+            is_verified=False
+        )
         Profile.objects.create(user= user)
-        self.send_confirmation_email(user)
-        self.context['token'] = AuthToken.objects.get_or_create(self.context['user'])[1]
+        self.send_confirmation_email(user)       
         return user
     
     def send_confirmation_email(self,user):
@@ -185,15 +201,18 @@ class UserSignupSerializer(serializers.Serializer):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token
-    
+
     def to_representation(self, instance):
+        user = super(UserSignupSerializer,self).to_representation(instance)
+        user.pop('password', None)
         return {
-            'user': self.context['user'],
+            'user': user,
             'access_token': self.context['token']
         }
 
 #Documentation
 class ResponseUserModelSerializer(serializers.Serializer):
 
+    expiry = serializers.CharField()
     user =  UserModelSerializer(many=True, read_only=True)
-    access_token = serializers.CharField()
+    token = serializers.CharField()

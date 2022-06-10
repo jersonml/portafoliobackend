@@ -261,7 +261,7 @@ REST_KNOX = {
   'AUTH_TOKEN_CHARACTER_LENGTH': 64,
   'AUTH_HEADER_PREFIX': 'Bearer',
   'TOKEN_TTL': None,
-  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+  'USER_SERIALIZER': 'portafoliobackend.users.serializers.UserModelSerializer',
   'TOKEN_LIMIT_PER_USER': None,
   'AUTO_REFRESH': False,
   'EXPIRY_DATETIME_FORMAT': None,

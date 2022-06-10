@@ -8,10 +8,7 @@ from rest_framework.routers import DefaultRouter
 from .views import users as user_views
 
 router = DefaultRouter()
-router.register(r'users',user_views.UserViewSet, basename='users')
+router.register(r'users',user_views.UserViewSet, basename='user')
 
-urlpatterns = [
-    path('',include(router.urls)),
-    path('users/logout/',user_views.UserLogoutAllView.as_view(), name="knox-logout"),
-    path('users/logoutall/',user_views.UserLogoutAllView.as_view(), name="knox-logoutall")
-]
+urlpatterns = router.urls
+app_name = 'api'
