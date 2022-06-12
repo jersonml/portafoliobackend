@@ -20,7 +20,7 @@ from portafoliobackend.users.models.profiles import Profile
 
 #Serializer
 from portafoliobackend.users.serializers.profile import (
-    ListProfileModelSerializer, 
+    BaseProfileModelSerializer, 
     ProfileModelSerializer
 )
 
@@ -42,7 +42,8 @@ class UserModelSerializer(serializers.ModelSerializer):
         )
 
 class ListUserModelSerializer(serializers.ModelSerializer):
-    profile = ListProfileModelSerializer(read_only=True)
+    
+    profile = BaseProfileModelSerializer(read_only=True)
 
     class Meta:
 

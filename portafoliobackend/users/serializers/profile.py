@@ -1,3 +1,6 @@
+#Library
+from datetime import timedelta
+
 #Django Rest Framework
 from rest_framework import serializers
 
@@ -10,18 +13,59 @@ from portafoliobackend.socialnetworks.serializers import SocialNetworksModelSeri
 #Models
 from portafoliobackend.users.models import Profile
 
-class ProfileModelSerializer(serializers.ModelSerializer):
+class BaseProfileModelSerializer(serializers.ModelSerializer):
+
+    experience = serializers.SerializerMethodField()
+    experience_date = serializers.DictField(
+        child=serializers.IntegerField(),
+        write_only= True,
+        required= False
+    )
+
+    class Meta:
+
+        model = Profile
+        fields = (
+            'picture',
+            'resume',
+            'biography',
+            'level_academy',
+            'qualities',
+            'experience',
+            'experience_date'
+        )
+
+    def get_experience(self,obj):
+        if isinstance(obj.experience, timedelta):
+                
+            days = obj.experience.days
+            years, days = divmod(days, 365)
+            month, days = divmod(days, 30)
+            week, _ = divmod(days, 7)
+        else:
+            years = month = week = 0
+        return  {
+            'years': years,
+            'month': month,
+            'week': week 
+        }
+
+class ProfileModelSerializer(BaseProfileModelSerializer):
+
+    DATE_EXPERIENCE = [
+        'years',
+        'month',
+        'week'
+    ]
 
     courses = CoursesModelSerializer(many=True)
     social_networks = SocialNetworksModelSerializer(many=True)
     items = ItemsModelSerializer(many=True)
     works = WorksModelSerializer(many=True)
 
-    #experience = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(BaseProfileModelSerializer.Meta):
 
-        model = Profile
         fields = (
             'courses',
             'social_networks',
@@ -32,7 +76,8 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'biography',
             'level_academy',
             'qualities',
-            'experience'
+            'experience',
+            'experience_date'
         )
         read_only_fields = (
             'courses',
@@ -40,26 +85,29 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'items',
             'works'
         )
-        
-
-    """def get_experience(self, obj):
-        return {
-            'years':obj.experience.total_minutes
-        }"""
 
 
-class ListProfileModelSerializer(serializers.ModelSerializer):
+    def validate_experience_date(self, attrs):
+        if  attrs:
 
-    class Meta:
+            required = set(self.DATE_EXPERIENCE) - set(attrs.keys())
+            if required:
+                raise serializers.ValidationError(f'required add key experience: {required}')
+            
+            days = attrs['years']*365
+            days += attrs['month']*30
+            days += attrs['week']*7
 
-        model = Profile
-        fields = (
-            'picture',
-            'resume',
-            'biography',
-            'level_academy',
-            'qualities',
-            'experience'
-        )
+            return {'time':timedelta(days=days)}
+        else:
+            return attrs
+    
+    
+    def update(self, instance, validated_data):
+        validated_data['experience'] = validated_data['experience_date'].get('time')
+        return super().update(instance, validated_data)
+
+
+
 
       

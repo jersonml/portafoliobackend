@@ -14,7 +14,6 @@ def custom_exception_handler(exc, context):
             customized_response['errors'].append(error)
 
         response.data = customized_response
-        response.data['status_code'] = response.status_code
 
     return response
 

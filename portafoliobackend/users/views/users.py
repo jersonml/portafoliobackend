@@ -6,22 +6,31 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, viewsets,mixins
 
-
 #Permisos
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
     IsAdminUser
 )
+from portafoliobackend.users.permissions import  (
+    IsAccountOwner, 
+    IsAccountVerified
+)
 
-from portafoliobackend.users.permissions import  IsAccountOwner, IsAccountVerified
+#Parses
+from portafoliobackend.utils.parser import MultipartJsonParser
+from rest_framework.parsers import MultiPartParser
 
 #Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 #Serializers
-from portafoliobackend.users.serializers import ProfileModelSerializer
+from rest_framework.serializers import Serializer
+from portafoliobackend.users.serializers import (
+    ProfileModelSerializer,
+    BaseProfileModelSerializer
+)
 from portafoliobackend.users.serializers import (
     UserLoginSerializer,
     UserModelSerializer,
@@ -30,7 +39,6 @@ from portafoliobackend.users.serializers import (
     ResponseUserModelSerializer,
     ListUserModelSerializer
 )
-from rest_framework.serializers import Serializer
 
 #Models
 from portafoliobackend.users.models import Users
@@ -79,9 +87,14 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 UserLogoutView,
                 UserLogoutAllView):
 
+    #Search users
     queryset = Users.objects.filter(is_active=True)
+
+    #Search user campo
     lookup_field = 'username'
 
+    #Parser
+    parser_classes = (MultiPartParser,)
     #Filters
     filter_backends = (SearchFilter, OrderingFilter,DjangoFilterBackend)
     search_fields = ('username','firts_name','last_name','email','country',)
@@ -137,7 +150,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
             200:ResponseUserModelSerializer
         }
     )
-    @action(detail=False,methods=['get'], url_name='login')
+    @action(detail=False,methods=['post'], url_name='login')
     def login(self, request, format=None,*args, **kwargs):
         return super(UserViewSet, self).login(request, format)
 
@@ -201,11 +214,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
     @swagger_auto_schema(
         operation_description='Edición de perfil',
         methods=['put','patch'],
-        request_body= ProfileModelSerializer,
+        request_body= BaseProfileModelSerializer,
         responses={
             200:UserModelSerializer
         },
-        tags=['Profile']
+        tags=['Profile'],
     )
     @action(detail=True, methods=['put','patch'])
     def profile(self, request, *args, **kwargs):

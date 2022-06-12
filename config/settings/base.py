@@ -249,6 +249,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
        'knox.auth.TokenAuthentication'
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'portafoliobackend.utils.rendery.CustomRenderer'
+    ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' ,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
