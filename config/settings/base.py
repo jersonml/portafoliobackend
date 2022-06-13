@@ -245,10 +245,6 @@ LOGGING = {
 
 #Json
 REST_FRAMEWORK = {
-  
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-       'knox.auth.TokenAuthentication'
-    ],
     'DEFAULT_RENDERER_CLASSES': [
         'portafoliobackend.utils.rendery.CustomRenderer'
     ],

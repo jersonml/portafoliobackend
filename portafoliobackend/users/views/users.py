@@ -17,9 +17,14 @@ from portafoliobackend.users.permissions import  (
     IsAccountVerified
 )
 
+#Auth
+from knox.auth import TokenAuthentication
+
 #Parses
-from portafoliobackend.utils.parser import MultipartJsonParser
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import (
+    MultiPartParser,
+    JSONParser
+)
 
 #Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -53,9 +58,7 @@ from knox.views import (
 from drf_yasg.utils import swagger_auto_schema
 
 class UserLoginView(LoginView):
-    permissions = [
-        AllowAny
-    ]
+
     def login(self, request, format=None,*args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -101,6 +104,19 @@ class UserViewSet(mixins.RetrieveModelMixin,
     ordering_fields = ('created','username','firts_name')
     ordering = ('created','username')
 
+    def initialize_request(self, request, *args, **kwargs):
+        """
+        The function initializes the request by setting the action to the
+        action_map.get(request.method.lower())
+        
+        The action_map is a dictionary that maps the HTTP methods to the corresponding viewset actions
+        
+        :param request: The request object
+        :return: The super() method returns the parent class of the class that calls it.
+        """
+        self.action = self.action_map.get(request.method.lower())
+        return super().initialize_request(request, *args, **kwargs)
+
     def get_permissions(self):
         """
         If the action is profile, then the user must be authenticated, must be the account owner, and
@@ -119,7 +135,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 IsAuthenticated, 
                 IsAccountOwner
             ]
-        elif self.action == 'logout-all':
+        elif self.action == 'logout_all':
              permissions = [
                 IsAuthenticated, 
                 IsAccountOwner,
@@ -142,6 +158,31 @@ class UserViewSet(mixins.RetrieveModelMixin,
         else:
             return Serializer
 
+    def get_parsers(self):
+        """
+        If the action is profile, then the parser is MultiPartParser, if the action is signup, then the
+        parser is MultiPartParser and JSONParser, otherwise the parser is JSONParser
+        :return: A list of parsers.
+        """
+        if self.action in ['profile']:
+            parser = [MultiPartParser]
+        elif self.action in ['signup']:
+            parser = [MultiPartParser,JSONParser]
+        else:
+            parser = [JSONParser]
+        return [p() for p in parser]
+
+    def get_authenticators(self):
+        """
+        If the action is logout, logout_all, update, partial_update, or profile, then use
+        TokenAuthentication. Otherwise, don't use any authentication
+        :return: A list of authentication classes.
+        """
+        if self.action in ['logout','logout_all','update','partial_update','profile']:
+            auth = [TokenAuthentication]
+        else:
+            auth = []
+        return [a() for a in auth]
     # A decorator that is used to document the view.
     @swagger_auto_schema(
         operation_description='Login de usuario, retorna los datos del mismo más el token de authentificación',
