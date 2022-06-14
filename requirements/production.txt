@@ -11,3 +11,6 @@ django-storages[boto3]==1.7.1
 django-anymail[mailgun]==5.0
 
 django-extensions==3.1.5
+
+#Media
+django-cloudinary-storage==0.3.0
