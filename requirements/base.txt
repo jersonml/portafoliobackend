@@ -11,7 +11,7 @@ django==3.2.13
 django-redis==5.2.0  # https://github.com/jazzband/django-redis
 
 # Environment
-django-environ==0.4.5
+django-environ==0.8.1
 
 #django restramework
 djangorestframework ==3.13.1
