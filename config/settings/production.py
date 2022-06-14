@@ -123,7 +123,8 @@ INSTALLED_APPS += ["anymail"]  # noqa F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 # https://anymail.readthedocs.io/en/stable/esps/mailgun/
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+EMAIL_BACKEND = "anymail.backends.sparkpost.EmailBackend"
+
 ANYMAIL = {
    "SPARKPOST_API_KEY": "a947d8285e3f47bdca8c2f03a83407183f293849",
     "SPARKPOST_API_URL": "https://api.sparkpost.com/api/v1",
