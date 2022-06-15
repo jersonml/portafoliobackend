@@ -182,7 +182,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
     def send_confirmation_email(self,user):
         verification_token = self.gen_verification_token(user)
         subject = f'Welcome @{user.username} verify your account to start using Portaolio'
-        from_email = "Portafolio <xljersonlx@portafolioback-jerson.herokuapp.com>"
+        from_email = "Portafolio <xljersonlx@gmail.com>"
         content = render_to_string(
             'emails/users/account_verification.html',
             {'token': verification_token,'user':user}

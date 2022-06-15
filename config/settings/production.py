@@ -116,32 +116,13 @@ EMAIL_SUBJECT_PREFIX = env(
 # Django Admin URL regex.
 ADMIN_URL = env("DJANGO_ADMIN_URL")
 
-# Anymail
+# EMail
 # ------------------------------------------------------------------------------
-# https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
-INSTALLED_APPS += ["anymail"]  # noqa F405
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-# https://anymail.readthedocs.io/en/stable/esps/mailgun/
-EMAIL_BACKEND = "anymail.backends.sparkpost.EmailBackend"
-
-ANYMAIL = {
-   "SPARKPOST_API_KEY": "a947d8285e3f47bdca8c2f03a83407183f293849",
-    "SPARKPOST_API_URL": "https://api.sparkpost.com/api/v1",
-    'SPARKPOST_SENDER_DOMAIN': "https://portafolioback-jerson.herokuapp.com/",
-
-    "SEND_DEFAULTS": {
-        "track_clicks": False,
-        "track_opens": False,
-    },
-}
-
-# Collectfast
-# ------------------------------------------------------------------------------
-# https://github.com/antonagestam/collectfast#installation
-#INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
-#INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
-
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 # LOGGING
 # ------------------------------------------------------------------------------
