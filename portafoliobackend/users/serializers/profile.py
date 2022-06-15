@@ -104,7 +104,8 @@ class ProfileModelSerializer(BaseProfileModelSerializer):
     
     
     def update(self, instance, validated_data):
-        validated_data['experience'] = validated_data['experience_date'].get('time')
+        if validated_data.get('experience_date'):
+            validated_data['experience'] = validated_data['experience_date'].get('time')
         return super().update(instance, validated_data)
 
 
