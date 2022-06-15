@@ -1,6 +1,6 @@
 # Base
 pytz==2018.7
-python-slugify==1.2.6
+python-slugify==6.1.2
 Pillow==9.1.1
 psycopg2==2.9.3 --no-binary psycopg2
 redis==4.3.3  # https://github.com/redis/redis-py
