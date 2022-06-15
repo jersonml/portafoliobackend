@@ -272,10 +272,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         profile = user.profile
         partial = request.method == 'PATCH'
         try: 
-            request.data['experience_date'] = \
-                request.data['experience_date'].replace("'",'"')
+            if request.data.get('experience_date'):
+                request.data['experience_date'] = \
+                    request.data['experience_date'].replace("'",'"')
             
-        except Exception as e:
+        except Exception:
             request.data['experience_date'] = {}
         serializer = ProfileModelSerializer(
             profile,
