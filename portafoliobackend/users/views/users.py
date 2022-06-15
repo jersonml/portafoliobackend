@@ -166,8 +166,6 @@ class UserViewSet(mixins.RetrieveModelMixin,
         """
         if self.action in ['profile']:
             parser = [MultiPartParser]
-        elif self.action in ['signup']:
-            parser = [MultiPartParser,JSONParser]
         else:
             parser = [JSONParser]
         return [p() for p in parser]
@@ -272,7 +270,13 @@ class UserViewSet(mixins.RetrieveModelMixin,
         """
         user = self.get_object()
         profile = user.profile
-        partial = request.method == 'PATCH' 
+        partial = request.method == 'PATCH'
+        try: 
+            request.data['experience_date'] = \
+                request.data['experience_date'].replace("'",'"')
+            
+        except Exception as e:
+            request.data['experience_date'] = {}
         serializer = ProfileModelSerializer(
             profile,
             data=request.data,

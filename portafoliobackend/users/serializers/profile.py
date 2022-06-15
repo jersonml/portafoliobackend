@@ -16,10 +16,10 @@ from portafoliobackend.users.models import Profile
 class BaseProfileModelSerializer(serializers.ModelSerializer):
 
     experience = serializers.SerializerMethodField()
-    experience_date = serializers.DictField(
-        child=serializers.IntegerField(),
+    experience_date = serializers.JSONField(
         write_only= True,
-        required= False
+        required= False,
+        help_text = "example: {'years':4,'month':1,'week':3}"
     )
 
     class Meta:

@@ -48,3 +48,14 @@ INSTALLED_APPS += ["django_extensions"]  # noqa F405
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+"""
+INSTALLED_APPS += ["cloudinary_storage"]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dudgao8kt',
+    'API_KEY': '427729324333868',
+    'API_SECRET': 'o8_0lbcfO5Y_4MLEyHR571rUBiE'
+}
+
+DEFAULT_FILE_STORAGE  =  'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = f'/media/'"""
