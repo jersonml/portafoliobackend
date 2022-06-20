@@ -19,7 +19,7 @@ django-rest-knox
 drf-yasg
 drf-nested-field-multipart==0.0.3
 
-django-filter == 21.1
+django-filter == 22.1
 
 # JWT
 PyJWT == 2.4.0
